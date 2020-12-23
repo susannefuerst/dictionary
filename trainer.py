@@ -15,7 +15,7 @@ def main(args):
         offset = -1
         if args.blockoffset:
             #offset = datetime.datetime.today().weekday()
-            offset = getoffset(args.numvoc)
+            offset = getoffset(args.numvoc, dict.numentries)
         block = dict.getblock(args.blocks, offset, args.numvoc)
         command = input()
         print("Learning block:\n")
@@ -51,12 +51,14 @@ def main(args):
         elif command == "b": printblock(block)
         voc = (voc + 1) % len(block)
 
-def getoffset(numvoc):
+def getoffset(numvoc, numentries):
     if not numvoc: numvoc = 60
     with open(root + "/offset", 'r') as off:
         offset = int(off.read())
     with open(root + "/offset", 'w') as off:
-        off.write(str(offset + int(numvoc)))
+        newoff = offset + int(numvoc)
+        if newoff >= numentries: newoff = 0
+        off.write(str(newoff))
     return offset
 
 def printblock(dictlist):

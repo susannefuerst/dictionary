@@ -14,27 +14,34 @@ class Dictionary:
         self.vocabulary.append(dict)
         self.numentries = self.numentries + 1
 
-    def getblock(self, numentries, offset, numvoc):
-        if not numvoc: numvoc = 0
+    def getblock(self, blocklength, offset, numvoc):
+        if not numvoc: numvoc = 60
         self.learned.extend(self.block)
         block = []
-        blockrange = numvoc
-        start = blockrange * offset
-        self.learningsubset = self.vocabulary[start:start+blockrange]
-        for i in range(numentries):
-            voc = random.randint(0, blockrange - 1)
-            inblock = self.learningsubset[voc] in block
-            learned = self.learningsubset[voc] in self.learned
-            optionsleft = len(self.learned) + len(block) < len(self.learningsubset)
-            if optionsleft:
-                while inblock or learned:
-                    voc = random.randint(0, blockrange - 1)
-                    inblock = self.learningsubset[voc] in block
-                    learned = self.learningsubset[voc] in self.learned
-            else:
-                print("Nearly all learned! This is the last block.")
-                break
-            block.append(self.learningsubset[voc])
+        start = offset
+        learningrange = min(numvoc, self.numentries - offset)
+        end = start + learningrange
+        self.learningsubset = self.vocabulary[start:end]
+        optionsleft = len(self.learned) + len(block) < len(self.learningsubset)
+        optionsleft = optionsleft or len(self.learned) == 0
+        if not optionsleft:
+            print("All done.")
+            exit()
+        else:
+            for i in range(blocklength):
+                voc = random.randint(0, learningrange - 1)
+                inblock = self.learningsubset[voc] in block
+                learned = self.learningsubset[voc] in self.learned
+                optionsleft = len(self.learned) + len(block) < len(self.learningsubset)
+                if optionsleft:
+                    while inblock or learned:
+                        voc = random.randint(0, learningrange - 1)
+                        inblock = self.learningsubset[voc] in block
+                        learned = self.learningsubset[voc] in self.learned
+                else:
+                    print("Nearly all learned! This is the last block.")
+                    break
+                block.append(self.learningsubset[voc])
         self.block = block
         return block
 
